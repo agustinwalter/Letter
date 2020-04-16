@@ -1,0 +1,46 @@
+name: letter
+description: An application to rent books.
+
+version: 1.0.1+2
+
+environment:
+  sdk: ">=2.2.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^0.1.2
+  firebase_messaging:
+  cloud_firestore:
+  firebase_storage:
+  firebase_auth:
+  flutter_auth_buttons:
+  google_sign_in:
+  permission_handler:
+  cached_network_image: ^2.0.0-rc
+  http:
+  url_launcher:
+  provider:
+  flutter_email_sender:
+  photo_view: ^0.9.0
+  youtube_player_flutter: ^6.0.3+2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_launcher_icons: ^0.7.2+1
+
+flutter_icons:
+  ios: true
+  android: true
+  image_path_ios: "assets/img/icon.png"
+  image_path_android: "assets/img/icon.png"
+  adaptive_icon_background: "assets/img/background.png"
+  adaptive_icon_foreground: "assets/img/foreground.png"
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/img/
