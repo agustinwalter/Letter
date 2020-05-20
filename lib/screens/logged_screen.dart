@@ -15,17 +15,17 @@ class LoggedScreen extends StatelessWidget {
         items: <BottomNavigationBarItem>[
           
           BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.flag), 
-            title: Text(
-              'Objetivos',
-              style: TextStyle(fontSize: 13),
-            )
-          ),
-          
-          BottomNavigationBarItem(
             icon: Icon(CupertinoIcons.book), 
             title: Text(
               'Prestar libros',
+              style: TextStyle(fontSize: 13),
+            )
+          ),
+
+          BottomNavigationBarItem(
+            icon: Icon(CupertinoIcons.flag), 
+            title: Text(
+              'Objetivos',
               style: TextStyle(fontSize: 13),
             )
           ),
@@ -52,26 +52,26 @@ class LoggedScreen extends StatelessWidget {
         return CupertinoTabView(
           builder: (context){
             return CupertinoPageScaffold(
-              navigationBar: CupertinoNavigationBar(
-                middle: ConditionalSwitch.single<int>(
-                  context: context,
-                  valueBuilder: (BuildContext context) => index,
-                  caseBuilders: {
-                    0: (BuildContext context) => Text('Objetivos'),
-                    1: (BuildContext context) => Text('Prestar libros'),
-                    2: (BuildContext context) => Text('Lista de deseos'),
-                    3: (BuildContext context) => Text('Perfil'),
-                  },
-                  fallbackBuilder: (BuildContext context) => Text('Objetivos')
-                )
-              ),
+              // navigationBar: CupertinoNavigationBar(
+              //   middle: ConditionalSwitch.single<int>(
+              //     context: context,
+              //     valueBuilder: (BuildContext context) => index,
+              //     caseBuilders: {
+              //       0: (BuildContext context) => Text('Prestar libros'),
+              //       1: (BuildContext context) => Text('Objetivos'),
+              //       2: (BuildContext context) => Text('Lista de deseos'),
+              //       3: (BuildContext context) => Text('Perfil'),
+              //     },
+              //     fallbackBuilder: (BuildContext context) => Text('Objetivos')
+              //   )
+              // ),
               child: SafeArea(
                 child: ConditionalSwitch.single<int>(
                   context: context,
                   valueBuilder: (BuildContext context) => index,
                   caseBuilders: {
-                    0: (BuildContext context) => ChallengesTab(),
-                    1: (BuildContext context) => LendBooksTab(),
+                    0: (BuildContext context) => LendBooksTab(),
+                    1: (BuildContext context) => ChallengesTab(),
                     2: (BuildContext context) => WishList(),
                     3: (BuildContext context) => ProfileTab(),
                   },

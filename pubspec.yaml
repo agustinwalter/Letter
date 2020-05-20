@@ -17,6 +17,8 @@ dependencies:
   fluttertoast:
   cloud_firestore:
   quickblox_sdk:
+  provider:
+  geolocator:
 
 dev_dependencies:
   flutter_test:

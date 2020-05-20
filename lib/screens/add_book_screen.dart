@@ -1,14 +1,21 @@
 import 'package:flutter/cupertino.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter/material.dart';
+import 'package:letter/models/user.dart';
+import 'package:provider/provider.dart';
 
 class AddBookScreen extends StatefulWidget {
+  final bool add;
+  const AddBookScreen({Key key, this.add: false}) : super(key: key);
   @override
-  _AddBookScreenState createState() => _AddBookScreenState();
+  _AddBookScreenState createState() => _AddBookScreenState(add);
 }
 
 class _AddBookScreenState extends State<AddBookScreen> {
   String title = '', author = '';
+  final bool add;
+
+  _AddBookScreenState(this.add);
 
   @override
   Widget build(BuildContext context) {
@@ -74,7 +81,7 @@ class _AddBookScreenState extends State<AddBookScreen> {
                 onPressed: () {
                   if(title == ''){
                     Fluttertoast.showToast(
-                      msg: "Escribí el título del libro",
+                      msg: "Escribe el título del libro",
                       toastLength: Toast.LENGTH_SHORT,
                       gravity: ToastGravity.TOP,
                       timeInSecForIosWeb: 1,
@@ -84,7 +91,7 @@ class _AddBookScreenState extends State<AddBookScreen> {
                     );
                   }else if(author == ''){
                     Fluttertoast.showToast(
-                      msg: "Escribí el autor del libro",
+                      msg: "Escribe el autor del libro",
                       toastLength: Toast.LENGTH_SHORT,
                       gravity: ToastGravity.TOP,
                       timeInSecForIosWeb: 1,
@@ -93,7 +100,13 @@ class _AddBookScreenState extends State<AddBookScreen> {
                       fontSize: 16
                     );
                   }else{
-                    FocusScope.of(context).requestFocus(new FocusNode());
+                    if(add){
+                      Provider.of<User>(context, listen: false).addBookToWishList({
+                        'title': title,
+                        'author': author
+                      });
+                    }
+                    FocusScope.of(context).requestFocus(FocusNode());
                     Navigator.pop(context, {
                       'title': title,
                       'author': author

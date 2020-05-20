@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:google_sign_in/google_sign_in.dart';
+import 'package:letter/models/user.dart';
+import 'package:provider/provider.dart';
 
 class ProfileTab extends StatelessWidget {
   @override
@@ -312,11 +313,7 @@ class ProfileTab extends StatelessWidget {
                                 color: CupertinoColors.destructiveRed
                               ),
                             ), 
-                            onPressed: () async {
-                              final GoogleSignIn googleSignIn = GoogleSignIn();
-                              await googleSignIn.signOut();
-                              print("User Sign Out");
-                            }
+                            onPressed: () => Provider.of<User>(context, listen: false).signOut()
                           )
 
                         ],
