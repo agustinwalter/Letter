@@ -102,14 +102,14 @@ class _AddBookScreenState extends State<AddBookScreen> {
                   }else{
                     if(add){
                       Provider.of<User>(context, listen: false).addBookToWishList({
-                        'title': title,
-                        'author': author
+                        'title': titleCase(title),
+                        'author': titleCase(author)
                       });
                     }
                     FocusScope.of(context).requestFocus(FocusNode());
                     Navigator.pop(context, {
-                      'title': title,
-                      'author': author
+                      'title': titleCase(title),
+                      'author': titleCase(author)
                     });
                   }
                 }
@@ -128,4 +128,16 @@ class _AddBookScreenState extends State<AddBookScreen> {
       )
     );
   }
+
+  String titleCase(String text) {
+    if (text.length <= 1) return text.toUpperCase();
+    List<String> words = text.split(' ');
+    var capitalized = words.map((word) {
+      String first = word.substring(0, 1).toUpperCase();
+      String rest = word.substring(1);
+      return '$first$rest';
+    });
+    return capitalized.join(' ');
+  }
+
 }

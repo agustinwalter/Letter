@@ -90,7 +90,7 @@ class _CreateWishListScreenState extends State<CreateWishListScreen> {
                             context,
                             MaterialPageRoute(builder: (context) => AddBookScreen()),
                           );
-                          if(newBook != null) setState(() => addedBooks.add(newBook));
+                          if(newBook != null) setState(() => addedBooks.add(newBook)); 
                         }
                       }
                     ),

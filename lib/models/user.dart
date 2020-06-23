@@ -15,9 +15,12 @@ class User extends ChangeNotifier {
   List opinions = [];
   List profileCards = [];
 
-  init() async {
-    final FirebaseAuth _auth = FirebaseAuth.instance;
-    FirebaseUser currentUser = await _auth.currentUser();
+  init({FirebaseUser user}) async {
+    FirebaseUser currentUser = user;
+    if(currentUser == null){
+      final FirebaseAuth _auth = FirebaseAuth.instance;
+      currentUser = await _auth.currentUser();
+    }
     // El usuario no está loggeado
     if(currentUser == null){
       isLoading = false;
@@ -32,7 +35,7 @@ class User extends ChangeNotifier {
         dataV = snap.data;
         if(!dataV.containsKey('money')) dataV['money'] = '0';
         if(!dataV.containsKey('image')) dataV['image'] = '';
-        if(!dataV.containsKey('reputation')) dataV['reputation'] = 3;
+        if(!dataV.containsKey('reputation')) dataV['reputation'] = 0;
       }
       isLoading = false;
       notifyListeners();
@@ -55,7 +58,7 @@ class User extends ChangeNotifier {
     assert(await user.getIdToken() != null);
     final FirebaseUser currentUser = await _auth.currentUser();
     assert(user.uid == currentUser.uid);
-    init();
+    init(user: currentUser);
   }
 
   createWishList(List<Map<String, String>> books) async {
