@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class User extends ChangeNotifier {
@@ -99,58 +100,36 @@ class User extends ChangeNotifier {
     });
   }
 
-  getBooksToLend(){
-    Future.delayed(Duration(milliseconds: 3000), () {
-      booksToLend = [
-        {
-          'title': 'Cien Años De Soledad',
-          'author': 'Gabriel García Marquez',
-          'distance': 2000
-        },
-        {
-          'title': 'A Sangre Fría',
-          'author': 'Truman Capote',
-          'distance': 2500
-        },
-        {
-          'title': 'El Alquimista',
-          'author': 'Paulo Cohelo',
-          'distance': 3000
-        },
-      ];
-      // booksToLend = [];
-      notifyListeners();
-    });
-
-
-    // QuerySnapshot users = await Firestore.instance.collection('users').orderBy('location').getDocuments();
-    // for (DocumentSnapshot user in users.documents) {
-    //   if(user.documentID != data.uid && user.data['wishList'].length > 0){
-    //     double myLat = dataV['location']['lat'];
-    //     double myLon = dataV['location']['lon'];
-    //     double lat = user.data['location']['lat'];
-    //     double lon = user.data['location']['lon'];
-    //     double distanceInMeters = await Geolocator().distanceBetween(myLat, myLon, lat, lon);
-    //     if(distanceInMeters < 20000){
-    //       if(booksToLend == null) booksToLend = [];
-    //       for (var book in user.data['wishList']) { 
-    //         if(book['points'] != null){
-    //           var bookWD = {
-    //             'title': book['title'],
-    //             'author': book['author'],
-    //             'points': book['points'],
-    //             'distance': distanceInMeters
-    //           };
-    //           booksToLend.add(bookWD);
-    //         }
-    //       }
-    //     }
-    //     notifyListeners();
-    //   }else{
-    //     if(booksToLend == null) booksToLend = [];
-    //     notifyListeners();
-    //   } 
-    // }
+  getBooksToLend() async {
+    // Busco a todos los usuarios que agregaron ubicación
+    QuerySnapshot users = await Firestore.instance.collection('users').orderBy('location').getDocuments();
+    for (DocumentSnapshot user in users.documents) {
+      // Si el usuario no soy yo, tiene lista de deseos...
+      if(user.documentID != data.uid && user.data['wishList'].length > 0){
+        double myLat = dataV['location']['lat'];
+        double myLon = dataV['location']['lon'];
+        double lat = user.data['location']['lat'];
+        double lon = user.data['location']['lon'];
+        double distanceInMeters = await Geolocator().distanceBetween(myLat, myLon, lat, lon);
+        // ...y vive a menos de 20km
+        if(distanceInMeters < 20000){
+          // Agrego sus libros a la lista
+          if(booksToLend == null) booksToLend = [];
+          for (var book in user.data['wishList']) { 
+            Map<String, dynamic> bookWD = {
+              'title': book['title'],
+              'author': book['author'],
+              'distance': distanceInMeters
+            };
+            booksToLend.add(bookWD);
+          }
+        }
+        notifyListeners();
+      }else{
+        if(booksToLend == null) booksToLend = [];
+        notifyListeners();
+      }
+    }
   }
 
   getLendUserInfo(){

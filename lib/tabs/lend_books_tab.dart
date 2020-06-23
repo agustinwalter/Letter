@@ -4,6 +4,7 @@ import 'package:letter/models/user.dart';
 import 'package:letter/screens/lend_book_details_screen.dart';
 import 'package:letter/widgets/loader.dart';
 import 'package:provider/provider.dart';
+import 'package:share/share.dart';
 
 class LendBooksTab extends StatefulWidget {
   @override
@@ -174,7 +175,12 @@ class _LendBooksTabState extends State<LendBooksTab> {
               CupertinoButton(
                 color: CupertinoColors.activeBlue,
                 child: Text('Invitar amig@s'), 
-                onPressed: () {}
+                onPressed: () {
+                  Share.share(
+                    '¡Ey! Descarga esta aplicación para prestarnos libros: https://play.google.com/store/apps/details?id=com.application.letter', 
+                    subject: 'Una aplicación para prestarnos libros'
+                  );
+                }
               )
 
             ],

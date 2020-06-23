@@ -23,6 +23,7 @@ dependencies:
   image_cropper:
   qr_flutter:
   barcode_scan:
+  share: '>=0.6.2+3 <2.0.0'
 
 dev_dependencies:
   flutter_test:
