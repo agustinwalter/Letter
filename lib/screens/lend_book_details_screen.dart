@@ -326,7 +326,10 @@ class _LendBookDetailsState extends State<LendBookDetails> {
       onTap: (){
         Navigator.of(context).push(
           CupertinoPageRoute(builder: (context){
-            return OpinionsScreen(name: name);
+            return OpinionsScreen(
+              name: name,
+              uid: widget.lendUserId
+            );
           })
         );
       },

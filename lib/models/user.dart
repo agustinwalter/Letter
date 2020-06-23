@@ -1,3 +1,4 @@
+import 'package:timeago/timeago.dart' as timeago;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
@@ -161,31 +162,24 @@ class User extends ChangeNotifier {
     notifyListeners();
   }
 
-  getOpinions(){
+  getOpinions(String uid) async {
     opinions = [];
-    Future.delayed(Duration(milliseconds: 1000), () {
-      opinions = [
-        {
-          'name': 'Agustín Walter',
-          'opinion': 'Muchas gracias por el trabajo realizado y por la paciencia. Profesionales, eficientes, rápidos y flexibles en las necesidades, son las características que definen a este gran equipo.',
-          'type': 2,
-          'date': 'Hace 2 semanas'
-        },
-        {
-          'name': 'Rodrigo Gauna',
-          'opinion': 'Muchas gracias por el trabajo realizado y por la paciencia.',
-          'type': 1,
-          'date': 'Hace 3 meses'
-        },
-        {
-          'name': 'Sofía Walter',
-          'opinion': 'Profesionales, eficientes, rápidos y flexibles en las necesidades, son las características que definen a este gran equipo.',
-          'type': 0,
-          'date': 'Hace 1 año'
-        },
-      ];
-      notifyListeners();
-    });
+    QuerySnapshot snap = await Firestore.instance.collection('opinions')
+    .where('to', isEqualTo: uid).getDocuments();
+    for (DocumentSnapshot doc in snap.documents) {
+      DateTime time = DateTime.fromMillisecondsSinceEpoch(
+        doc.data['date'].millisecondsSinceEpoch
+      );
+      String date = timeago.format(time, locale: 'es');
+      date = '${date[0].toUpperCase()}${date.substring(1)}';
+      opinions.add({
+        'name': doc.data['name'],
+        'opinion': doc.data['opinion'],
+        'type': doc.data['type'],
+        'date': date
+      });
+    }
+    notifyListeners();
   }
 
   getProfileCards(){
