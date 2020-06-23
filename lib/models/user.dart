@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class User extends ChangeNotifier {
@@ -9,6 +8,12 @@ class User extends ChangeNotifier {
   FirebaseUser data;
   Map<String, dynamic> dataV = {};
   List<Map<String, dynamic>> booksToLend;
+  Map<String, dynamic> lendUserInfo = {
+    'name': '',
+    'reputation': 0
+  };
+  List opinions = [];
+  List profileCards = [];
 
   init() async {
     final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -23,7 +28,12 @@ class User extends ChangeNotifier {
     data = currentUser;
     Firestore.instance.document('users/${currentUser.uid}')
     .snapshots().listen((DocumentSnapshot snap) {
-      if(snap.exists) dataV = snap.data;
+      if(snap.exists){
+        dataV = snap.data;
+        if(!dataV.containsKey('money')) dataV['money'] = '0';
+        if(!dataV.containsKey('image')) dataV['image'] = '';
+        if(!dataV.containsKey('reputation')) dataV['reputation'] = 3;
+      }
       isLoading = false;
       notifyListeners();
       return;
@@ -86,32 +96,133 @@ class User extends ChangeNotifier {
     });
   }
 
-  getBooksToLend() async {
-    QuerySnapshot users = await Firestore.instance.collection('users').orderBy('location').getDocuments();
-    for (DocumentSnapshot user in users.documents) {
-      if(user.documentID != data.uid && user.data['wishList'].length > 0){
-        double myLat = dataV['location']['lat'];
-        double myLon = dataV['location']['lon'];
-        double lat = user.data['location']['lat'];
-        double lon = user.data['location']['lon'];
-        double distanceInMeters = await Geolocator().distanceBetween(myLat, myLon, lat, lon);
-        if(distanceInMeters < 20000){
-          if(booksToLend == null) booksToLend = [];
-          for (var book in user.data['wishList']) { 
-            var bookWD = {
-              'title': book['title'],
-              'author': book['author'],
-              'distance': distanceInMeters
-            };
-            booksToLend.add(bookWD); 
-          }
-        }
-        notifyListeners();
-      }else{
-        if(booksToLend == null) booksToLend = [];
-        notifyListeners();
-      } 
-    }
+  getBooksToLend(){
+    Future.delayed(Duration(milliseconds: 3000), () {
+      booksToLend = [
+        {
+          'title': 'Cien Años De Soledad',
+          'author': 'Gabriel García Marquez',
+          'distance': 2000
+        },
+        {
+          'title': 'A Sangre Fría',
+          'author': 'Truman Capote',
+          'distance': 2500
+        },
+        {
+          'title': 'El Alquimista',
+          'author': 'Paulo Cohelo',
+          'distance': 3000
+        },
+      ];
+      // booksToLend = [];
+      notifyListeners();
+    });
+
+
+    // QuerySnapshot users = await Firestore.instance.collection('users').orderBy('location').getDocuments();
+    // for (DocumentSnapshot user in users.documents) {
+    //   if(user.documentID != data.uid && user.data['wishList'].length > 0){
+    //     double myLat = dataV['location']['lat'];
+    //     double myLon = dataV['location']['lon'];
+    //     double lat = user.data['location']['lat'];
+    //     double lon = user.data['location']['lon'];
+    //     double distanceInMeters = await Geolocator().distanceBetween(myLat, myLon, lat, lon);
+    //     if(distanceInMeters < 20000){
+    //       if(booksToLend == null) booksToLend = [];
+    //       for (var book in user.data['wishList']) { 
+    //         if(book['points'] != null){
+    //           var bookWD = {
+    //             'title': book['title'],
+    //             'author': book['author'],
+    //             'points': book['points'],
+    //             'distance': distanceInMeters
+    //           };
+    //           booksToLend.add(bookWD);
+    //         }
+    //       }
+    //     }
+    //     notifyListeners();
+    //   }else{
+    //     if(booksToLend == null) booksToLend = [];
+    //     notifyListeners();
+    //   } 
+    // }
+  }
+
+  getLendUserInfo(){
+    lendUserInfo = {
+      'name': '',
+      'reputation': 0,
+      'distance': 0
+    };
+    Future.delayed(Duration(milliseconds: 500), () {
+      lendUserInfo = {
+        'name': 'María',
+        'image': 'https://www.laprensa.hn/csp/mediapool/sites/dt.common.streams.StreamServer.cls?STREAMOID=EPvuNX15N56wxlEpiUYw4c\$daE2N3K4ZzOUsqbU5sYsVkWrnOtsMWQvXhFzoKc7f6FB40xiOfUoExWL3M40tfzssyZqpeG_J0TFo7ZhRaDiHC9oxmioMlYVJD0A\$3RbIiibgT65kY_CSDiCiUzvHvODrHApbd6ry6YGl5GGOZrs-&CONTENTTYPE=image/jpeg',
+        'reputation': 3,
+        'distance': 18344
+      };
+      notifyListeners();
+    });
+  }
+
+  getOpinions(){
+    opinions = [];
+    Future.delayed(Duration(milliseconds: 1000), () {
+      opinions = [
+        {
+          'name': 'Agustín Walter',
+          'opinion': 'Muchas gracias por el trabajo realizado y por la paciencia. Profesionales, eficientes, rápidos y flexibles en las necesidades, son las características que definen a este gran equipo.',
+          'type': 2,
+          'date': 'Hace 2 semanas'
+        },
+        {
+          'name': 'Rodrigo Gauna',
+          'opinion': 'Muchas gracias por el trabajo realizado y por la paciencia.',
+          'type': 1,
+          'date': 'Hace 3 meses'
+        },
+        {
+          'name': 'Sofía Walter',
+          'opinion': 'Profesionales, eficientes, rápidos y flexibles en las necesidades, son las características que definen a este gran equipo.',
+          'type': 0,
+          'date': 'Hace 1 año'
+        },
+      ];
+      notifyListeners();
+    });
+  }
+
+  getProfileCards(){
+    profileCards = [];
+    Future.delayed(Duration(milliseconds: 1000), () {
+      profileCards = [
+        {
+          'type': 'add_photo'
+        },
+        {
+          'type': 'delivery',
+          'status': 'pre_delivery',
+          'book': 'A Sangre Fría',
+          'name': 'María'
+        },
+        {
+          'type': 'received',
+          'status': 'received',
+          'book': 'Cien Años De Soledad',
+          'name': 'José'
+        },
+        {
+          'type': 'reputation',
+          'status': 0
+        },
+        {
+          'type': 'configuration',
+        },
+      ];
+      notifyListeners();
+    });
   }
 
 }

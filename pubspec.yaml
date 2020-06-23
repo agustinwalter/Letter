@@ -4,7 +4,7 @@ description: An application to rent books.
 version: 1.0.1+2
 
 environment:
-  sdk: ">=2.2.0 <3.0.0"
+  sdk: '>=2.2.0 <3.0.0'
 
 dependencies:
   flutter:
@@ -19,6 +19,10 @@ dependencies:
   quickblox_sdk:
   provider:
   geolocator:
+  image_picker:
+  image_cropper:
+  qr_flutter:
+  barcode_scan:
 
 dev_dependencies:
   flutter_test:

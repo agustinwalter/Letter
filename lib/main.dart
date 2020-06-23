@@ -42,6 +42,7 @@ class _LetterState extends State<Letter> {
             builder: (context, user, child) {
               if(user.isLoading) return Loader(true);
               if(user.data == null) return LoginScreen();
+              else if(user.dataV == null) return CreateWishListScreen();
               else if(user.dataV['wishList'] == null) return CreateWishListScreen();
               else if(user.dataV['location'] == null) return GetLocationScreen();
               else return LoggedScreen();
