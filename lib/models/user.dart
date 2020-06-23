@@ -37,6 +37,10 @@ class User extends ChangeNotifier {
         if(!dataV.containsKey('money')) dataV['money'] = '0';
         if(!dataV.containsKey('image')) dataV['image'] = '';
         if(!dataV.containsKey('reputation')) dataV['reputation'] = 0;
+      }else{
+        Firestore.instance.document('users/${currentUser.uid}').setData({
+          'name': currentUser.displayName
+        });
       }
       isLoading = false;
       notifyListeners();
@@ -119,6 +123,7 @@ class User extends ChangeNotifier {
             Map<String, dynamic> bookWD = {
               'title': book['title'],
               'author': book['author'],
+              'uid': user.documentID,
               'distance': distanceInMeters
             };
             booksToLend.add(bookWD);
@@ -132,21 +137,28 @@ class User extends ChangeNotifier {
     }
   }
 
-  getLendUserInfo(){
+  getLendUserInfo(String lendUserId, double distance) async {
     lendUserInfo = {
       'name': '',
       'reputation': 0,
       'distance': 0
     };
-    Future.delayed(Duration(milliseconds: 500), () {
+
+    DocumentSnapshot doc = await Firestore.instance.document('users/$lendUserId').get();
+    if(doc.exists){
+      String image;
+      int reputation = 0;
+      if(doc.data['image'] != null) image = doc.data['image'];
+      if(doc.data['reputation'] != null) reputation = doc.data['reputation'];
       lendUserInfo = {
-        'name': 'María',
-        'image': 'https://www.laprensa.hn/csp/mediapool/sites/dt.common.streams.StreamServer.cls?STREAMOID=EPvuNX15N56wxlEpiUYw4c\$daE2N3K4ZzOUsqbU5sYsVkWrnOtsMWQvXhFzoKc7f6FB40xiOfUoExWL3M40tfzssyZqpeG_J0TFo7ZhRaDiHC9oxmioMlYVJD0A\$3RbIiibgT65kY_CSDiCiUzvHvODrHApbd6ry6YGl5GGOZrs-&CONTENTTYPE=image/jpeg',
-        'reputation': 3,
-        'distance': 18344
+        'name': doc.data['name'].split(' ')[0],
+        'image': image,
+        'reputation': reputation,
+        'distance': distance.round()
       };
-      notifyListeners();
-    });
+    }
+
+    notifyListeners();
   }
 
   getOpinions(){

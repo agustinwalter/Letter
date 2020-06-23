@@ -79,7 +79,11 @@ class _LendBooksTabState extends State<LendBooksTab> {
                 onTap: (){
                   Navigator.of(context).push(
                     CupertinoPageRoute(builder: (context){
-                      return LendBookDetails(bookName: user.booksToLend[i-1]['title']);
+                      return LendBookDetails(
+                        bookName: user.booksToLend[i-1]['title'],
+                        lendUserId: user.booksToLend[i-1]['uid'],
+                        distance: user.booksToLend[i-1]['distance'],
+                      );
                     })
                   );
                 },
