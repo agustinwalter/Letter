@@ -12,6 +12,8 @@ dependencies:
 
   cupertino_icons:
   firebase_auth:
+  firebase_core:
+  firebase_storage:
   google_sign_in:
   flutter_conditional_rendering:
   fluttertoast:

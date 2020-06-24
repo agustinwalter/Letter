@@ -80,7 +80,33 @@ class _SettingScreenState extends State<SettingScreen> {
                                   color: CupertinoColors.destructiveRed
                                 ),
                               ),
-                              onPressed: (){},
+                              onPressed: (){
+                                showCupertinoDialog(
+                                  context: context,
+                                  builder: (BuildContext context) => CupertinoAlertDialog(
+                                    title: Text("Eliminar foto"),
+                                    content: Text('¿Deseas eliminar tu foto de perfil?'),
+                                    actions: <Widget>[
+                                      CupertinoDialogAction(
+                                        isDefaultAction: true,
+                                        child: Text("Cancelar"),
+                                        onPressed: () => Navigator.pop(context),
+                                      ),
+                                      CupertinoDialogAction(
+                                        isDestructiveAction: true,
+                                        child: Text(
+                                          'Eliminar', 
+                                          style: TextStyle(color: CupertinoColors.destructiveRed)
+                                        ),
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                          Provider.of<User>(context, listen: false).deleteImage();
+                                        },
+                                      )
+                                    ],
+                                  )
+                                );
+                              },
                             ),
 
                           ],

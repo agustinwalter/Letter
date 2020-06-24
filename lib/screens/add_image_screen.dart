@@ -1,8 +1,11 @@
 import 'dart:io';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:letter/models/user.dart';
+import 'package:provider/provider.dart';
 
 class AddImageScreen extends StatefulWidget {
   @override
@@ -137,9 +140,17 @@ class _AddImageScreenState extends State<AddImageScreen> {
 
         Container(
           width: screenWidth * .6,
-          child: LinearProgressIndicator(
-            value: .25,
-          ),
+          child: StreamBuilder<StorageTaskEvent>(
+            stream: Provider.of<User>(context, listen: false).uploadImage(userImage),
+            builder: (context, stream) {
+              var e = stream?.data?.snapshot;
+              double progress = e != null
+                ? e.bytesTransferred / e.totalByteCount
+                : 0;
+              if(progress == 1) Navigator.pop(context);
+              return LinearProgressIndicator(value: progress);
+            },
+          )
         ),
       ],
     );

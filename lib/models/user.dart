@@ -1,3 +1,5 @@
+import 'dart:io';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -210,6 +212,29 @@ class User extends ChangeNotifier {
         },
       ];
       notifyListeners();
+    });
+  }
+
+  Stream<StorageTaskEvent> uploadImage(File image){
+    final FirebaseStorage storage = FirebaseStorage(storageBucket: 'gs://letter-bfbab.appspot.com');
+    StorageUploadTask uploadTask;
+    String path = 'profilePics/${data.uid}.jpg';
+    uploadTask = storage.ref().child(path).putFile(image);
+    uploadTask.onComplete.then((value) async {
+      String url = await value.ref.getDownloadURL();
+      Firestore.instance.document('users/${data.uid}').updateData({
+        'image': url
+      });
+    });
+    return uploadTask.events;
+  }
+
+  deleteImage() async {
+    final FirebaseStorage storage = FirebaseStorage(storageBucket: 'gs://letter-bfbab.appspot.com');
+    String path = 'profilePics/${data.uid}.jpg';
+    await storage.ref().child(path).delete();
+    Firestore.instance.document('users/${data.uid}').updateData({
+      'image': FieldValue.delete()
     });
   }
 
