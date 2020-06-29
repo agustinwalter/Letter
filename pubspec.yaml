@@ -18,7 +18,6 @@ dependencies:
   flutter_conditional_rendering:
   fluttertoast:
   cloud_firestore:
-  quickblox_sdk:
   provider:
   geolocator:
   image_picker:
@@ -27,6 +26,9 @@ dependencies:
   barcode_scan:
   share: '>=0.6.2+3 <2.0.0'
   timeago:
+  connectycube_sdk:
+  firebase_messaging: ^6.0.16
+  http:
 
 dev_dependencies:
   flutter_test:

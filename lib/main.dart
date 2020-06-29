@@ -29,7 +29,7 @@ class _LetterState extends State<Letter> {
   @override
   void initState() {
     super.initState();
-    Provider.of<User>(context, listen: false).init();
+    Provider.of<User>(context, listen: false).initUser();
   }
   
   @override

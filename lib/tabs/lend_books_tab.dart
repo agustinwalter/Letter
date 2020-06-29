@@ -81,8 +81,9 @@ class _LendBooksTabState extends State<LendBooksTab> {
                     CupertinoPageRoute(builder: (context){
                       return LendBookDetails(
                         bookName: user.booksToLend[i-1]['title'],
+                        bookAuthor: user.booksToLend[i-1]['author'],
                         lendUserId: user.booksToLend[i-1]['uid'],
-                        distance: user.booksToLend[i-1]['distance'],
+                        distance: user.booksToLend[i-1]['distance']
                       );
                     })
                   );

@@ -1,3 +1,5 @@
+/functions/node_modules
+/android/app/release/app-release.apk
 /android/app/release/app-release.aab
 key.jks
 

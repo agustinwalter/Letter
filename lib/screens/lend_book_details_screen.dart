@@ -7,9 +7,9 @@ import 'package:letter/screens/opinions_screen.dart';
 import 'package:provider/provider.dart';
 
 class LendBookDetails extends StatefulWidget {
-  final String bookName, lendUserId;
+  final String bookName, bookAuthor, lendUserId;
   final double distance;
-  const LendBookDetails({Key key, this.bookName, this.lendUserId, this.distance}) : super(key: key);
+  const LendBookDetails({Key key, this.bookName, this.lendUserId, this.distance, this.bookAuthor}) : super(key: key);
   @override
   _LendBookDetailsState createState() => _LendBookDetailsState();
 }
@@ -132,7 +132,12 @@ class _LendBookDetailsState extends State<LendBookDetails> {
                         child: Text('Prestar libro'),
                         onPressed: (){
                           Navigator.of(context).push(
-                            CupertinoPageRoute(builder: (context) => ChatScreen())
+                            CupertinoPageRoute(builder: (context) => ChatScreen(
+                              name: user.lendUserInfo['name'],
+                              otherId: widget.lendUserId,
+                              bookName: widget.bookName,
+                              bookAuthor: widget.bookAuthor,
+                            ))
                           );
                         },
                       )

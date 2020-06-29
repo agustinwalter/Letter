@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:letter/models/user.dart';
 import 'package:letter/screens/add_image_screen.dart';
+import 'package:letter/screens/chat_screen.dart';
 import 'package:letter/screens/opinions_screen.dart';
 import 'package:letter/screens/qr_screen.dart';
 import 'package:letter/screens/settings_screen.dart';
@@ -460,7 +461,17 @@ class _ProfileTabState extends State<ProfileTab> {
                           Icon(CupertinoIcons.forward, color: CupertinoColors.activeBlue,),
                         ],
                       ),
-                      onPressed: (){},
+                      onPressed: (){
+                        Navigator.of(context).push(
+                          CupertinoPageRoute(builder: (context) => ChatScreen(
+                            name: cardData['name'],
+                            otherId: cardData['uid'],
+                            bookName: cardData['book'],
+                            bookAuthor: cardData['author'],
+                            receiving: true,
+                          ))
+                        );
+                      },
                     ),
 
                     // Botón dos
@@ -469,8 +480,6 @@ class _ProfileTabState extends State<ProfileTab> {
                       padding: EdgeInsets.all(0),
                       visualDensity: VisualDensity.compact,
                       child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
                             'Escanear código QR',
@@ -480,7 +489,6 @@ class _ProfileTabState extends State<ProfileTab> {
                               color: CupertinoColors.activeBlue
                             ),
                           ),
-                          Icon(CupertinoIcons.forward, color: CupertinoColors.activeBlue,),
                         ],
                       ),
                       onPressed: () async {
