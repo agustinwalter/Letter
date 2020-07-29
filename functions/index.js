@@ -1,22 +1,20 @@
 const functions = require('firebase-functions');
-const cors = require('cors')({origin: true})
+let admin = require('firebase-admin');
+admin.initializeApp(functions.config().firebase);
 
-exports.sendNotificationEmail = functions.https.onRequest((request, response) => {
-  cors(request, response, () => {
-    response.sendStatus(200)
-    const mailgun = require("mailgun-js")
-    const mg = mailgun({
-      apiKey: 'e28f9abc70961c15d26a12d5d463388b-73ae490d-3b38f93c', 
-      domain: 'sandboxf870e01660854c60b39f0b7782a27afb.mailgun.org'
-    })
-    const data = {
-      from: 'Agustín Walter <agustin@letter.com>',
-      to: 'letterlibros@gmail.com',
-      subject: 'Recibiste un nuevo email',
-      text: `Hola Agustín, una nueva persona quiere que le avises cuando Letter esté disponible:\n\n${request.query.email}`
+exports.sendMessageNotification = functions.https.onRequest((request, response) => {
+  admin.messaging().sendToDevice(
+    request.body.token,
+    {
+      notification: {
+        title: request.body.name,
+        body: request.body.message,
+        sound: 'default',
+        badge: '0',
+        color: '#00ddff',
+        clickAction: 'FLUTTER_NOTIFICATION_CLICK'
+      }
     }
-    mg.messages().send(data, (error, body) => {
-      console.log(`Email de notificación enviado`)
-    })
-  });
-})
+  );
+  response.send("Notificación enviada, o no...");
+});
