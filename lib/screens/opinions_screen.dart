@@ -4,8 +4,8 @@ import 'package:letter/models/user.dart';
 import 'package:provider/provider.dart';
 
 class OpinionsScreen extends StatefulWidget {
-  final String name;
-  const OpinionsScreen({Key key, this.name}) : super(key: key);
+  final String name, uid;
+  const OpinionsScreen({Key key, this.name, this.uid}) : super(key: key);
   @override
   _OpinionsScreenState createState() => _OpinionsScreenState();
 }
@@ -14,7 +14,7 @@ class _OpinionsScreenState extends State<OpinionsScreen> {
   @override
   void initState() {
     super.initState();
-    Provider.of<User>(context, listen: false).getOpinions();
+    Provider.of<User>(context, listen: false).getOpinions(widget.uid);
   }
   
   @override
@@ -32,6 +32,19 @@ class _OpinionsScreenState extends State<OpinionsScreen> {
                 itemCount: user.opinions.length + 1,
                 itemBuilder: (BuildContext context, int i) {
                   if(i == 0){
+                    if(widget.uid == user.data.uid){
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                        child: Text(
+                          'Esto es lo que opinan los usuarios de ti:',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontFamily: 'Lato',
+                            color: CupertinoColors.black,
+                          ),
+                        )
+                      );
+                    }
                     return Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                       child: RichText(
