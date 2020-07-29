@@ -1,6 +1,4 @@
 /functions/node_modules
-/android/app/release/app-release.apk
-/android/app/release/app-release.aab
 key.jks
 
 # Miscellaneous
@@ -42,6 +40,9 @@ key.jks
 **/android/gradlew.bat
 **/android/local.properties
 **/android/**/GeneratedPluginRegistrant.java
+**/android/app/release/app-release.apk
+**/android/app/release/app-release.aab
+**/android/app/google-services.json
 
 # iOS/XCode related
 **/ios/**/*.mode1v3

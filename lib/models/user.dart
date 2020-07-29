@@ -1,8 +1,9 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:connectycube_sdk/connectycube_chat.dart';
 import 'package:connectycube_sdk/connectycube_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:letter/providers/push_notifications_provider.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -18,15 +19,14 @@ class User extends ChangeNotifier {
   List<Map<String, dynamic>> booksToLend;
   Map<String, dynamic> lendUserInfo = {'name': '', 'reputation': 0};
   List opinions = [];
-  List profileCards = [];
+  List<Map<String, dynamic>> profileCards = [];
   CubeUser cubeUser;
+  StreamSubscription<DocumentSnapshot> listenDatabase;
 
   initUser({FirebaseUser user}) async {
     FirebaseUser currentUser = user;
-    if (currentUser == null) {
-      final FirebaseAuth _auth = FirebaseAuth.instance;
-      currentUser = await _auth.currentUser();
-    }
+    if (currentUser == null)
+      currentUser = await FirebaseAuth.instance.currentUser();
     // El usuario no está loggeado
     if (currentUser == null) {
       isLoading = false;
@@ -35,20 +35,65 @@ class User extends ChangeNotifier {
     }
     // El usuario está loggeado
     data = currentUser;
-    initChat();
-    await updateSuscriptionToken();
-    Firestore.instance
-        .document('users/${currentUser.uid}')
-        .snapshots()
-        .listen((DocumentSnapshot snap) async {
-      dataV = snap.data;
-      if (!dataV.containsKey('money')) dataV['money'] = '0';
-      if (!dataV.containsKey('image')) dataV['image'] = '';
-      if (!dataV.containsKey('reputation')) dataV['reputation'] = 0;
+
+    // Inicio el chat
+    // initChat();
+
+    // Inicio las notificaciones
+    final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+    _firebaseMessaging.configure(
+      onMessage: (Map<String, dynamic> message) async =>
+          print("onMessage: $message"),
+      onLaunch: (Map<String, dynamic> message) async =>
+          print("onLaunch: $message"),
+      onResume: (Map<String, dynamic> message) async =>
+          print("onResume: $message"),
+    );
+    _firebaseMessaging.requestNotificationPermissions(
+        const IosNotificationSettings(
+            sound: true, badge: true, alert: true, provisional: true));
+    _firebaseMessaging.onIosSettingsRegistered
+        .listen((IosNotificationSettings settings) {
+      print("Settings registered: $settings");
+    });
+    DocumentReference doc = Firestore.instance.document('users/${data.uid}');
+    _firebaseMessaging.getToken().then((String token) async {
+      assert(token != null);
+      DocumentSnapshot snap = await doc.get();
+      snap.exists
+          ? doc.updateData({'subsToken': token})
+          : doc.setData({'name': data.displayName, 'subsToken': token});
+    });
+
+    listenDatabase = doc.snapshots().listen((DocumentSnapshot snap) async {
+      if (!snap.exists) {
+        doc.setData({'name': data.displayName});
+        dataV = {
+          'name': data.displayName,
+          'money': '0',
+          'image': '',
+          'reputation': 0
+        };
+        profileCards.insert(0, {'type': 'add_photo'});
+      } else {
+        dataV = snap.data;
+        if (!dataV.containsKey('money')) dataV['money'] = '0';
+        if (!dataV.containsKey('image')) {
+          dataV['image'] = '';
+          profileCards.insert(0, {'type': 'add_photo'});
+        } else {
+          profileCards.removeAt(0);
+          print(profileCards);
+        }
+        if (!dataV.containsKey('reputation')) dataV['reputation'] = 0;
+      }
       isLoading = false;
       notifyListeners();
-      return;
     });
+  }
+
+  endApp() {
+    if (listenDatabase != null) listenDatabase.cancel();
   }
 
   login() async {
@@ -188,35 +233,41 @@ class User extends ChangeNotifier {
     notifyListeners();
   }
 
-  getProfileCards() {
-    profileCards = [];
-    Future.delayed(Duration(milliseconds: 1000), () {
-      profileCards = [
-        {'type': 'add_photo'},
-        {
-          'type': 'delivery',
-          'status': 'pre_delivery',
-          'book': 'A Sangre Fría',
-          'name': 'María'
-        },
-        {
-          'type': 'received',
-          'status': 'received',
-          'book': 'Cien Años De Soledad',
-          'author': 'Larralde',
-          'uid': 'uid',
-          'name': 'José'
-        },
-        {'type': 'reputation', 'status': 0},
-        {
-          'type': 'configuration',
-        },
-      ];
-      notifyListeners();
-    });
-  }
+  // getProfileCards() {
+  //   profileCards.addAll([
+  //     {'type': 'reputation', 'status': 0},
+  //     {'type': 'configuration'}
+  //   ]);
+  // profileCards = [
+  //   {'type': 'reputation', 'status': 0},
+  //   {'type': 'configuration'}
+  // ];
 
-  Stream<StorageTaskEvent> uploadImage(File image) {
+  // if (dataV['image'] == '') profileCards.insert(0, {'type': 'add_photo'});
+
+  // Future.delayed(Duration(milliseconds: 1000), () {
+  //   profileCards = [
+  //     {
+  //       'type': 'delivery',
+  //       'status': 'pre_delivery',
+  //       'book': 'A Sangre Fría',
+  //       'name': 'María'
+  //     },
+  //     {
+  //       'type': 'received',
+  //       'status': 'received',
+  //       'book': 'Cien Años De Soledad',
+  //       'author': 'Larralde',
+  //       'uid': 'uid',
+  //       'name': 'José'
+  //     },
+  //     {'type': 'reputation', 'status': 0}
+  //   ];
+  // notifyListeners();
+  // });
+  // }
+
+  Stream<StorageTaskEvent> uploadImage(File image, context) {
     final FirebaseStorage storage =
         FirebaseStorage(storageBucket: 'gs://letter-bfbab.appspot.com');
     StorageUploadTask uploadTask;
@@ -224,9 +275,11 @@ class User extends ChangeNotifier {
     uploadTask = storage.ref().child(path).putFile(image);
     uploadTask.onComplete.then((value) async {
       String url = await value.ref.getDownloadURL();
-      Firestore.instance
+      await Firestore.instance
           .document('users/${data.uid}')
           .updateData({'image': url});
+      profileCards.removeAt(0);
+      Navigator.pop(context, true);
     });
     return uploadTask.events;
   }
@@ -319,19 +372,40 @@ class User extends ChangeNotifier {
     }
   }
 
-  Future<void> updateSuscriptionToken() async {
-    String token = await PushNotificationsProvider().initNotifications();
-    DocumentReference doc = Firestore.instance.document('users/${data.uid}');
-    DocumentSnapshot snap = await doc.get();
-    snap.exists
-        ? await doc.updateData({'subsToken': token})
-        : await doc.setData({'name': data.displayName, 'subsToken': token});
-  }
-
   Future<String> getNotificationToken(String uid) async {
     DocumentSnapshot doc =
         await Firestore.instance.document('users/$uid').get();
     if (doc.exists) return doc.data['subsToken'];
     return null;
   }
+}
+
+class UserData{
+  // Datos obtenidos de Firebase Auth
+  // displayName [String]
+  // photoUrl [String - null]
+  // email [String]
+  // uid [String]
+
+  // Datos obtenidos de Firestore, colección users (documentId = uid)
+  // displayName (Obtenido de Firebase Auth) [String]
+  // photoUrl (Obtenido de Firebase Auth) [String - undefined]
+  // reputation [Number - undefined]
+}
+
+class Book{
+  // title
+  // author
+  // geohash
+  // status
+  // uid
+}
+
+class Opinion{
+  // message
+  // date
+  // type
+  // fromName
+  // fromUid
+  // toUid
 }

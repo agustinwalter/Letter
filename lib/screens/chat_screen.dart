@@ -167,86 +167,89 @@ class _ChatScreenState extends State<ChatScreen> {
               },
             )),
         child: SafeArea(
-            child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Expanded(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Expanded(
                 child: Stack(
-              children: <Widget>[
-                // Cargando
-                Opacity(
-                  opacity: loadingMessages ? 1 : 0,
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 15),
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Text(
-                            'Cargando mensajes',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontFamily: 'Lato',
-                              color: CupertinoColors.systemGrey,
-                            ),
-                          ),
-                          Container(
-                              margin: EdgeInsets.only(top: 5),
-                              width: 130,
-                              child: LinearProgressIndicator())
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-
-                // Mensajes
-                messages != null
-                    ? ListView.builder(
-                        itemCount: messages.length,
-                        padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
-                        reverse: true,
-                        itemBuilder: (BuildContext context, int index) {
-                          if (messages[index].senderId == cubeUser.id)
-                            return me(messages[index].body);
-                          return you(messages[index].body);
-                        })
-                    : SizedBox(),
-
-                // Info
-                // infoCard()
-              ],
-            )),
-
-            // Campo de texto
-            Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Expanded(
+                  children: <Widget>[
+                    // Cargando
+                    Opacity(
+                      opacity: loadingMessages ? 1 : 0,
                       child: Padding(
-                    padding: const EdgeInsets.only(left: 16),
-                    child: CupertinoTextField(
-                      controller: textController,
-                      minLines: 1,
-                      maxLines: 5,
-                      placeholder: 'Escribe aquí',
-                      padding: EdgeInsets.all(8),
-                    ),
-                  )),
-                  CupertinoButton(
-                      padding: EdgeInsets.fromLTRB(12, 0, 12, 0),
-                      child: Icon(
-                        Icons.send,
-                        size: 26,
+                        padding: const EdgeInsets.only(bottom: 15),
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Text(
+                                'Cargando mensajes',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontFamily: 'Lato',
+                                  color: CupertinoColors.systemGrey,
+                                ),
+                              ),
+                              Container(
+                                  margin: EdgeInsets.only(top: 5),
+                                  width: 130,
+                                  child: LinearProgressIndicator())
+                            ],
+                          ),
+                        ),
                       ),
-                      onPressed: () => sendMessage())
-                ],
+                    ),
+
+                    // Mensajes
+                    messages != null
+                        ? ListView.builder(
+                            itemCount: messages.length,
+                            padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
+                            reverse: true,
+                            itemBuilder: (BuildContext context, int index) {
+                              if (messages[index].senderId == cubeUser.id)
+                                return me(messages[index].body);
+                              return you(messages[index].body);
+                            })
+                        : SizedBox(),
+
+
+                    // Info
+                    // infoCard()
+                  ],
+                )
               ),
-            )
-          ],
-        )));
+
+              // Campo de texto
+              Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Expanded(
+                        child: Padding(
+                      padding: const EdgeInsets.only(left: 16),
+                      child: CupertinoTextField(
+                        controller: textController,
+                        minLines: 1,
+                        maxLines: 5,
+                        placeholder: 'Escribe aquí',
+                        padding: EdgeInsets.all(8),
+                      ),
+                    )),
+                    CupertinoButton(
+                        padding: EdgeInsets.fromLTRB(12, 0, 12, 0),
+                        child: Icon(
+                          Icons.send,
+                          size: 26,
+                        ),
+                        onPressed: () => sendMessage())
+                  ],
+                ),
+              )
+            ],
+          ))
+        );
   }
 
   Widget infoCard() {
