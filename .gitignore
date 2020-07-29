@@ -43,6 +43,7 @@ key.jks
 **/android/app/release/app-release.apk
 **/android/app/release/app-release.aab
 **/android/app/google-services.json
+**/android/app/src/main/api-key.txt
 
 # iOS/XCode related
 **/ios/**/*.mode1v3

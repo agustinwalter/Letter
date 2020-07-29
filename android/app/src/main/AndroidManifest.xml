@@ -41,9 +41,7 @@
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
             
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyDchLTnAtH9ss-xLwPTTyPDG8d2qtk2HVU" />
+        <!-- Google Geo api key -->
             
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
